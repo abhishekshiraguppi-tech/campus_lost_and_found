@@ -1,0 +1,23 @@
+{
+  "name": "campus-lost-found-root",
+  "version": "1.0.0",
+  "description": "Campus Lost & Found Management System - Full Stack Project",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "cmd /c npm --prefix server start",
+    "server": "cmd /c npm --prefix server dev",
+    "client": "cmd /c npm --prefix client dev",
+    "build:client": "cmd /c npm --prefix client build",
+    "install:all": "cmd /c npm --prefix server install && cmd /c npm --prefix client install"
+  },
+  "keywords": [
+    "campus",
+    "lost-and-found",
+    "express",
+    "react",
+    "vite",
+    "nodejs"
+  ],
+  "author": "Student Developer",
+  "license": "ISC"
+}
