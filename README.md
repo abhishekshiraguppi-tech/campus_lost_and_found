@@ -1,40 +1,102 @@
 # 🎓 Campus Lost & Found Management System
 
-A beginner-friendly, clean, functional, and modern full-stack web application designed for students and campus staff to report lost items, submit found items, browse campus listings, search/filter items by location or category, and contact item posters directly.
+A beginner-friendly, clean, functional, and modern full-stack web application designed for university students and campus staff to report lost property, turn in found items, search campus listings by location or category, and reunite items with their owners.
 
-> **Note**: This application does **NOT** require any login, registration, user accounts, or complex database setups. All data is persisted locally in a simple JSON file with uploaded images stored in a local directory.
+> **Note**: This application does **NOT** require any login, registration, user accounts, or complex database setups. All data is persisted locally in a simple JSON file with uploaded photos stored in a local directory.
 
 ---
 
-## 🌟 Key Features
+## 🏛️ System Architecture & Data Flow
 
-- **🏠 Modern Campus Landing Page**: Features a hero banner, quick actions ("Report Lost", "Report Found", "Browse Items"), real-time statistics counters (Total Lost, Found, Reunited), a "How It Works" guide, and recent campus listings.
-- **🚨 Report Lost Item Form**: Submit lost property with name, category, description, date, approximate location, contact information, additional details, and optional photo upload with validation.
-- **📦 Report Found Item Form**: Submit items found across lecture halls, libraries, or dining halls so owners can quickly claim them.
-- **🔍 Browse & Filter Listings**: View items as responsive cards with status badges (🔴 Lost, 🟢 Found, 💜 Reunited). Includes real-time keyword search, status filtering, category selection, and newest/oldest date sorting.
-- **📖 Item Detail View & Modal**: Modal popups and dedicated routes (`/items/:id`) displaying complete item details, high-resolution photo viewer, reporter contact card with one-click copy to clipboard, and status updates.
-- **🤝 Mark as Reunited**: Single-click action to update item status to **Reunited** when an item is safely returned to its owner.
-- **📊 Analytics & Dashboard**: Overview of campus metrics (Total Reports, Active Lost/Found, Reunited count, Success Rate %), interactive visual progress bars by category, status distribution summaries, and recent activity logs.
-- **💾 Persistent JSON Storage**: Automatic data initialization with seed data and auto-creation of storage directories (`server/data/` and `server/uploads/`).
+The application follows a **Decoupled Client-Server REST Architecture**:
+
+```
++--------------------------------+           HTTP / REST API            +----------------------------------+
+|   React + Vite Frontend        | <==================================> |   Node.js + Express Backend      |
+|   (Port 3000)                  |   JSON Data / Multipart Uploads      |   (Port 5000)                    |
++--------------------------------+                                      +----------------------------------+
+                                                                                         |
+                                                                        +----------------+----------------+
+                                                                        |                                 |
+                                                                        v                                 v
+                                                              +-------------------+             +--------------------+
+                                                              | server/data/      |             | server/uploads/    |
+                                                              | items.json        |             | (Item Photos)      |
+                                                              +-------------------+             +--------------------+
+```
+
+### 🔄 End-to-End Data Flow Example
+
+1. **Reporting Property**:
+   - A student fills out the report form at `/report-lost` or `/report-found`.
+   - The React client sends a `POST` request with `multipart/form-data` to `http://localhost:5000/api/items`.
+   - Express validates input fields, saves any attached photo to `server/uploads/`, appends the new record to `server/data/items.json`, and returns a `201 Created` response.
+
+2. **Searching & Filtering**:
+   - When a user types in the search bar or selects filter pills (e.g. status `Lost`, category `Electronics`), React calls `GET /api/items?search=calculator&status=lost`.
+   - The controller reads `items.json`, applies search & filter criteria, and returns matching items instantly.
+
+3. **Reuniting Items**:
+   - When an owner claims an item, a student clicks **"✓ Mark as Reunited"**.
+   - The client sends `PATCH /api/items/:id/reunite`.
+   - Express updates the item status to `Reunited`, saves the record, and the UI updates in real time.
+
+---
+
+## 🌟 Pages & Key Features
+
+### 🏠 1. Home Page (`/`)
+- **Campus Hero Banner**: Highlighting the platform purpose with quick action buttons (*Report Lost*, *Report Found*, *Browse Items*).
+- **Live Counters**: Displays active metrics for *Total Lost*, *Total Found*, *Items Reunited*, and *Total Reports*.
+- **"How It Works" Guide**: Step-by-step walkthrough explaining how students post, search, and reunite items.
+- **Recent Listings**: Grid of the 4 newest reports with item photos, badges, dates, and quick view buttons.
+
+### 🚨 2. Report Lost & 📦 Report Found (`/report-lost` & `/report-found`)
+- Reusable form component with real-time field validation for:
+  - Item Name *(Required)*
+  - Category *(Electronics, Keys & Cards, Bags & Wallets, Clothing, Books, etc.)*
+  - Date Lost / Found *(Required)*
+  - Approximate Location *(e.g., "Library 3rd Floor" or "Science Building Rm 204")*
+  - Detailed Description & Additional Instructions
+  - Contact Name & Phone / Email
+  - **Photo Upload**: Client & server validation for file type (JPG, PNG, WEBP, GIF) and 5MB max file size.
+- Auto-generates unique IDs, timestamps entries, sets status to `Lost` or `Found`, and saves to persistent storage.
+
+### 🔍 3. Browse Items Page (`/browse`)
+- Displays all reported items in responsive card grids.
+- **Real-Time Search**: Instant search matching item names, descriptions, locations, and categories.
+- **Filter Tabs**: Filter by `All`, `Lost`, `Found`, or `Reunited`.
+- **Category & Sort**: Select categories and sort listings by newest or oldest report date.
+- **Empty State**: Clear messaging and reset options when no items match filters.
+
+### 📖 4. Item Detail View (`/items/:id` & Modal Popup)
+- Full item detail viewer with photo preview, location tag, reporter contact card, and a **"📋 Copy Contact Info"** button.
+- **"✓ Mark as Reunited" Button**: Allows single-click resolution of item status.
+
+### 📊 5. Dashboard Analytics (`/dashboard`)
+- Metrics grid (*Total Reports, Active Lost, Active Found, Reunited, Success Rate %*).
+- **Category Distribution**: Visual progress bar charts showing item breakdown by category.
+- **Status Summary**: Proportion bars comparing Lost vs. Found vs. Reunited items.
+- **Recent Activity Table**: Log of recent campus reports with quick view links.
 
 ---
 
 ## 🛠️ Recommended Tech Stack
 
 ### Frontend
-- **React (v18)**: Component-based user interface.
-- **Vite (v5)**: Fast development server and production bundler.
+- **React (v18)**: Component-driven user interface.
+- **Vite (v5)**: Lightning-fast development server & bundler.
 - **React Router (v6)**: Client-side routing (`/`, `/browse`, `/report-lost`, `/report-found`, `/dashboard`, `/items/:id`).
-- **Custom Modern CSS**: Responsive layout, CSS variables, glassmorphism, campus colors, and smooth micro-animations.
+- **Custom CSS**: Responsive layout, CSS variables, campus colors, and hover micro-animations.
 
 ### Backend
 - **Node.js**: JavaScript runtime environment.
-- **Express.js**: RESTful API server.
-- **Multer**: Middleware for handling `multipart/form-data` and image uploads with file type (JPG, PNG, WEBP, GIF) and size limit (5MB) validation.
+- **Express.js**: RESTful API framework.
+- **Multer**: Middleware for `multipart/form-data` file uploads with size and format validation.
 
 ### Storage
-- **JSON File Storage**: Persistent storage in `server/data/items.json`.
-- **Local Uploads Directory**: Static image file storage in `server/uploads/`.
+- **JSON File Storage**: Persistent data file at `server/data/items.json`.
+- **Local Uploads Directory**: Static image file storage at `server/uploads/`.
 
 ---
 
@@ -43,7 +105,7 @@ A beginner-friendly, clean, functional, and modern full-stack web application de
 ```
 campus-lost-found/
 │
-├── client/                     # Frontend React + Vite app
+├── client/                     # Frontend React + Vite application
 │   ├── public/                 # Static assets & favicon
 │   ├── src/
 │   │   ├── components/         # Reusable UI Components
@@ -60,12 +122,12 @@ campus-lost-found/
 │   │   │   ├── ReportFoundPage.jsx
 │   │   │   ├── ItemDetailPage.jsx
 │   │   │   └── DashboardPage.jsx
-│   │   ├── services/           # API Client Service
+│   │   ├── services/           # API Client Service (Fetch wrapper)
 │   │   │   └── api.js
 │   │   ├── styles/             # Global Stylesheet & CSS Variables
 │   │   │   └── index.css
-│   │   ├── App.jsx             # React Router Setup
-│   │   └── main.jsx            # Entry point
+│   │   ├── App.jsx             # React Router navigation setup
+│   │   └── main.jsx            # React entry point
 │   ├── index.html
 │   ├── vite.config.js
 │   └── package.json
@@ -73,7 +135,7 @@ campus-lost-found/
 ├── server/                     # Backend Node.js + Express server
 │   ├── data/
 │   │   └── items.json          # Persistent JSON storage file (auto-generated)
-│   ├── uploads/                # Directory for uploaded item images (auto-generated)
+│   ├── uploads/                # Directory for uploaded item photos (auto-generated)
 │   ├── controllers/
 │   │   └── itemsController.js  # CRUD & Filter logic
 │   ├── middleware/
@@ -84,137 +146,59 @@ campus-lost-found/
 │   ├── server.js               # Main Express app entry point
 │   └── package.json
 │
-├── README.md                   # Project documentation
-└── package.json                # Root package for running scripts
+├── README.md                   # Comprehensive project documentation
+└── package.json                # Root package for running helper scripts
 ```
 
 ---
 
 ## 🚀 Quick Start Guide
 
-### Prerequisites
-Make sure you have **Node.js** (v16 or higher) and **npm** installed on your system.
-Verify by running:
-```bash
-node -v
-npm -v
-```
-
----
-
 ### Step 1: Install Dependencies
-
-You can install dependencies for both the backend server and frontend client.
-
-#### Option A: Quick Command (from root folder)
 ```bash
-npm run install:all
-```
-
-#### Option B: Manual Setup
-Open two terminal windows or run sequentially:
-
-**Backend Dependencies:**
-```bash
+# Backend Dependencies
 cd server
 npm install
-```
 
-**Frontend Dependencies:**
-```bash
+# Frontend Dependencies
 cd client
 npm install
 ```
 
----
-
 ### Step 2: Start the Application
 
-To run the application locally, you will start the **Backend Server** (Port 5000) and **Frontend Client** (Port 3000).
+Open two terminal windows:
 
-#### Terminal 1: Start Backend Server
+**Terminal 1 (Backend Server - Port 5000):**
 ```bash
 cd server
 npm start
 ```
-*or for auto-reload development mode:*
-```bash
-cd server
-npm run dev
-```
-> Server runs at `http://localhost:5000`
 
-#### Terminal 2: Start Frontend Client
+**Terminal 2 (Frontend Client - Port 3000):**
 ```bash
 cd client
 npm run dev
 ```
-> Frontend runs at `http://localhost:3000`
 
-Open your web browser and navigate to **`http://localhost:3000`** to view the application!
+Visit **`http://localhost:3000`** in your browser!
 
 ---
 
-## 📡 REST API Documentation
-
-The backend server exposes clean REST endpoints under `/api/items`.
+## 📡 REST API Reference
 
 | Method | Endpoint | Description | Query Parameters |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/api/items` | Retrieve all items | `search`, `status` (lost/found/reunited/all), `category`, `sort` (newest/oldest) |
 | `GET` | `/api/items/stats` | Retrieve system analytics & summary counts | None |
 | `GET` | `/api/items/:id` | Retrieve single item details by ID | None |
-| `POST` | `/api/items` | Create new lost/found report (supports image upload) | `multipart/form-data` |
-| `PUT` | `/api/items/:id` | Update item details or replace image | `multipart/form-data` |
+| `POST` | `/api/items` | Create new lost/found report | `multipart/form-data` |
+| `PUT` | `/api/items/:id` | Update item details or image | `multipart/form-data` |
 | `PATCH` | `/api/items/:id/reunite` | Mark item status as **Reunited** | None |
-| `DELETE` | `/api/items/:id` | Remove item listing | None |
-
-### Sample JSON Item Structure
-```json
-{
-  "id": "item_1727700000003",
-  "name": "Brown Vintage Leather Backpack",
-  "status": "Lost",
-  "category": "Bags & Wallets",
-  "description": "Dark brown vintage leather backpack containing Organic Chemistry notebook and dorm keys.",
-  "date": "2026-09-30",
-  "location": "Central Campus Library - 3rd Floor Quiet Area",
-  "contactName": "Jordan Lee",
-  "contactInfo": "jordan.l@campus.edu / (555) 234-5678",
-  "additionalDetails": "Reward offered if returned intact with class notes!",
-  "imageUrl": "/uploads/item-1727700000003.jpg",
-  "createdAt": "2026-09-30T09:00:00.000Z"
-}
-```
+| `DELETE` | `/api/items/:id` | Delete item listing | None |
 
 ---
 
-## 💾 Data & Image Storage Explanation
+## 📄 License & Student Note
 
-- **Data File (`server/data/items.json`)**: When the backend server boots up for the first time, it checks if `data/items.json` exists. If not, it creates the folder and populates the file with initial seed items so the web page is never blank. Any create, update, or status change writes directly to this file, persisting across server restarts.
-- **Uploads Folder (`server/uploads/`)**: Any images attached during submission are verified for file type (JPG, PNG, WEBP, GIF) and file size (< 5MB), renamed with a timestamp string to prevent name collisions, and saved in `server/uploads/`. The Express server serves these files publicly at `http://localhost:5000/uploads/filename`.
-
----
-
-## 🖼️ Application Screenshots & UI Sections
-
-1. **Home Page**: Includes campus header, quick statistics counter cards, workflow guide, and recent listings grid.
-2. **Browse Items Page**: Interactive search bar with instant filter pills for Status, Category dropdown, Date sorting, and responsive card views.
-3. **Report Lost / Report Found Forms**: Clean forms with client-side required field validation, file drag-and-drop preview, and submission confirmation messages.
-4. **Item Detail View**: Modal & standalone view with high-res photo viewer, full description, reporter contact box, and one-click "Mark as Reunited" resolution.
-5. **Dashboard Analytics**: System metrics, success rate percentage, category distribution progress bars, and recent activity timeline.
-
----
-
-## 🔮 Future Improvements
-
-If expanding this project for a higher-level course or capstone project, potential enhancements include:
-- **Campus Map Integration**: Interactive SVG or Leaflet map allowing students to pin exact lost/found locations on a campus map.
-- **Email Notifications**: Integration with Nodemailer to send automated notifications when a matching item category is reported.
-- **QR Code Generation**: Generate printable QR code posters for lost items to hang on campus bulletin boards.
-
----
-
-## 📄 License & Academic Note
-
-This project is created as an open, educational Full-Stack Software Engineering project for college students. Free to use, adapt, and demonstrate!
+This open-source project is created as a Full-Stack Software Engineering project for college students. Free to use, demonstrate, and customize!
