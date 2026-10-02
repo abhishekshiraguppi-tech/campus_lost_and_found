@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { getItemById, markAsReunited } from '../services/api';
+import { getItemById, markAsReunited, deleteItem } from '../services/api';
 import NotificationBanner from '../components/NotificationBanner';
 
 export default function ItemDetailPage() {
@@ -42,6 +42,17 @@ export default function ItemDetailPage() {
       }
     } catch (err) {
       setNotification({ type: 'error', message: err.message || 'Failed to update status' });
+    }
+  };
+
+  const handleRemoveListing = async () => {
+    if (!window.confirm('Remove this reunited listing? This cannot be undone.')) return;
+
+    try {
+      await deleteItem(id);
+      navigate('/browse');
+    } catch (err) {
+      setNotification({ type: 'error', message: err.message || 'Failed to remove listing' });
     }
   };
 
@@ -163,9 +174,14 @@ export default function ItemDetailPage() {
               ✓ Mark as Reunited
             </button>
           ) : (
-            <span style={{ fontSize: '1rem', color: 'var(--color-reunited)', fontWeight: 700 }}>
-              ✓ Item Reunited & Resolved
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '1rem', color: 'var(--color-reunited)', fontWeight: 700 }}>
+                ✓ Item Reunited & Resolved
+              </span>
+              <button className="btn btn-sm btn-outline" onClick={handleRemoveListing}>
+                Remove Listing
+              </button>
+            </div>
           )}
         </div>
       </div>
