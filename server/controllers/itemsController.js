@@ -3,80 +3,8 @@ const path = require('path');
 
 const DATA_FILE = path.join(__dirname, '../data/items.json');
 
-// Sample seed data to populate if data file doesn't exist
-const SEED_ITEMS = [
-  {
-    id: "item_1727500000001",
-    name: "Graphing Calculator (TI-84 Plus CE)",
-    status: "Lost",
-    category: "Electronics",
-    description: "Black Texas Instruments TI-84 Plus CE graphing calculator with a blue protective slider case. Left in lecture hall room 204 after Math 101.",
-    date: "2026-09-28",
-    location: "Science Hall - Room 204",
-    contactName: "Alex Rivera",
-    contactInfo: "alex.rivera@campus.edu",
-    additionalDetails: "Has a sticker of a laptop cat on the back slider cover.",
-    imageUrl: null,
-    createdAt: "2026-09-28T10:15:00.000Z"
-  },
-  {
-    id: "item_1727600000002",
-    name: "Hydro Flask Water Bottle (Navy Blue)",
-    status: "Found",
-    category: "Personal Items",
-    description: "32 oz Navy Blue Hydro Flask with multiple national park stickers. Found sitting on the bench outside the main entrance.",
-    date: "2026-09-29",
-    location: "Student Union Plaza",
-    contactName: "Campus Security Desk",
-    contactInfo: "555-0192 / security@campus.edu",
-    additionalDetails: "Item turned in to the main reception desk on 1st floor.",
-    imageUrl: null,
-    createdAt: "2026-09-29T14:30:00.000Z"
-  },
-  {
-    id: "item_1727700000003",
-    name: "Brown Vintage Leather Backpack",
-    status: "Lost",
-    category: "Bags & Wallets",
-    description: "Dark brown vintage leather backpack containing Organic Chemistry notebook, blue folder, and a set of dorm keys on a brass carabiner.",
-    date: "2026-09-30",
-    location: "Central Campus Library - 3rd Floor Quiet Area",
-    contactName: "Jordan Lee",
-    contactInfo: "jordan.l@campus.edu / (555) 234-5678",
-    additionalDetails: "Reward offered if returned intact with chemistry notes!",
-    imageUrl: null,
-    createdAt: "2026-09-30T09:00:00.000Z"
-  },
-  {
-    id: "item_1727800000004",
-    name: "Student ID Card & Red Lanyard",
-    status: "Found",
-    category: "Keys & Cards",
-    description: "Student ID card for 'Sam Taylor' attached to a crimson university lanyard with two brass keys.",
-    date: "2026-10-01",
-    location: "Dining Hall Annex",
-    contactName: "Dining Hall Manager",
-    contactInfo: "dining.lostfound@campus.edu",
-    additionalDetails: "Currently stored safely at the dining hall info desk.",
-    imageUrl: null,
-    createdAt: "2026-10-01T12:45:00.000Z"
-  },
-  {
-    id: "item_1727400000005",
-    name: "Wireless Headphones (Sony WH-1000XM4)",
-    status: "Reunited",
-    category: "Electronics",
-    description: "Black Sony noise-canceling wireless headphones in black hard shell carrying case.",
-    date: "2026-09-25",
-    location: "Engineering Building - Study Lounge",
-    contactName: "Marcus Vance",
-    contactInfo: "marcus.v@campus.edu",
-    additionalDetails: "Reunited with owner successfully.",
-    imageUrl: null,
-    createdAt: "2026-09-25T16:20:00.000Z",
-    reunitedAt: "2026-09-27T11:00:00.000Z"
-  }
-];
+// Initial data store initialized empty without mock or fake users
+const SEED_ITEMS = [];
 
 /**
  * Safely read items array from data/items.json

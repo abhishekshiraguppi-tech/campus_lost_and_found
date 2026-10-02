@@ -316,7 +316,7 @@ export default function ItemForm({ mode = 'lost' }) {
               type="text"
               name="contactName"
               className={`form-control ${errors.contactName ? 'error' : ''}`}
-              placeholder="e.g., Alex Smith"
+              placeholder="Enter your name"
               value={formData.contactName}
               onChange={handleChange}
             />
@@ -331,7 +331,7 @@ export default function ItemForm({ mode = 'lost' }) {
               type="text"
               name="contactInfo"
               className={`form-control ${errors.contactInfo ? 'error' : ''}`}
-              placeholder="e.g., alex.s@campus.edu or (555) 019-2834"
+              placeholder="email@campus.edu or phone number"
               value={formData.contactInfo}
               onChange={handleChange}
             />
