@@ -4,9 +4,23 @@ const API_BASE = '/api/items';
  * Utility helper to handle HTTP responses and JSON parsing
  */
 async function handleResponse(response) {
-  const data = await response.json().catch(() => ({}));
+  const text = await response.text().catch(() => '');
+  let data = {};
+  try {
+    data = JSON.parse(text);
+  } catch (e) {
+    // Response was not valid JSON (e.g. Vite proxy 500 page when backend is stopped)
+  }
+
   if (!response.ok) {
-    const errorMsg = data.message || data.errors?.join(', ') || `Server returned status ${response.status}`;
+    let errorMsg = data.message || (Array.isArray(data.errors) ? data.errors.join(', ') : null);
+    if (!errorMsg) {
+      if (response.status === 500) {
+        errorMsg = 'Backend server is offline or unreachable. Please start the backend server (npm start in server folder).';
+      } else {
+        errorMsg = `Server returned status ${response.status}`;
+      }
+    }
     throw new Error(errorMsg);
   }
   return data;
