@@ -38,18 +38,30 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Root endpoint info
-app.get('/', (req, res) => {
-  res.json({
-    message: 'Welcome to Campus Lost & Found API Server',
-    endpoints: {
-      health: 'GET /api/health',
-      items: 'GET /api/items',
-      stats: 'GET /api/items/stats',
-      createItem: 'POST /api/items'
+// Serve built client React app in production if available
+const clientDistPath = path.join(__dirname, '../client/dist');
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+      return next();
     }
+    res.sendFile(path.join(clientDistPath, 'index.html'));
   });
-});
+} else {
+  // Root endpoint info for API standalone mode
+  app.get('/', (req, res) => {
+    res.json({
+      message: 'Welcome to Campus Lost & Found API Server',
+      endpoints: {
+        health: 'GET /api/health',
+        items: 'GET /api/items',
+        stats: 'GET /api/items/stats',
+        createItem: 'POST /api/items'
+      }
+    });
+  });
+}
 
 // Centralized error handler
 app.use((err, req, res, next) => {
